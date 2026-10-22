@@ -1,0 +1,19 @@
+{
+  "style": "flat-square-v1",
+  "badges": [
+    {
+      "file": "stage.svg",
+      "label": "Stage",
+      "value": "Experimental",
+      "category": "version",
+      "evidence": "../../README.md"
+    },
+    {
+      "file": "python.svg",
+      "label": "Python",
+      "value": "3.10-3.12",
+      "category": "runtime",
+      "evidence": "../../references/local-setup.md"
+    }
+  ]
+}

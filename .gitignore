@@ -1,0 +1,37 @@
+# Private voice identity and machine configuration
+references/voice-profile.json
+references/voice-profile.local.json
+references/voice-profiles.json
+*.local.json
+local/
+assets/
+# Models, recordings, caches, and generated outputs
+*.wav
+*.mp3
+*.mp4
+*.flac
+*.pt
+*.pth
+*.safetensors
+models/
+outputs/
+output/
+cache/
+*.manifest.json
+*.approval.json
+*-plan.json
+# Environments, captures, databases, and secret files
+.env
+.env.*
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.log
+*.sqlite*
+*.db
+*.zip
+*.7z
+tmp/
+_screenshots/

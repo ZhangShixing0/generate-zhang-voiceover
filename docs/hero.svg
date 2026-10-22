@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 430" role="img" aria-labelledby="title desc">
+  <title id="title">按稿试听与生成的两段口播音频流程</title>
+  <desc id="desc">同一份可见口播稿经过朗读计划后，先生成试听，确认后生成完整音频。</desc>
+  <rect width="1200" height="430" rx="28" fill="#101918"/>
+  <path d="M0 320 C120 270 170 360 290 305 S470 260 590 315 S790 365 920 292 S1080 245 1200 300" fill="none" stroke="#d7a35d" stroke-width="3" opacity=".65"/>
+  <path d="M0 350 C120 300 170 390 290 335 S470 290 590 345 S790 395 920 322 S1080 275 1200 330" fill="none" stroke="#83b7b4" stroke-width="2" opacity=".35"/>
+  <text x="76" y="92" fill="#f4eee4" font-family="system-ui, sans-serif" font-size="36" font-weight="700">SAME SCRIPT. LISTEN FIRST.</text>
+  <text x="78" y="132" fill="#b8c4bd" font-family="system-ui, sans-serif" font-size="20">Content stays visible while sound moves through a reviewable handoff.</text>
+  <g font-family="system-ui, sans-serif">
+    <rect x="78" y="190" width="282" height="86" rx="16" fill="#f4eee4"/>
+    <text x="104" y="226" fill="#101918" font-size="16" font-weight="700">01  FINAL SCRIPT</text>
+    <text x="104" y="253" fill="#3f514c" font-size="15">one editable source of truth</text>
+    <path d="M380 233 H455" stroke="#d7a35d" stroke-width="4"/>
+    <path d="M447 224 l12 9 -12 9" fill="none" stroke="#d7a35d" stroke-width="4"/>
+    <rect x="475" y="190" width="282" height="86" rx="16" fill="#d7a35d"/>
+    <text x="501" y="226" fill="#101918" font-size="16" font-weight="700">02  PREVIEW</text>
+    <text x="501" y="253" fill="#3f3a2d" font-size="15">whole semantic units, then listen</text>
+    <path d="M777 233 H852" stroke="#83b7b4" stroke-width="4"/>
+    <path d="M844 224 l12 9 -12 9" fill="none" stroke="#83b7b4" stroke-width="4"/>
+    <rect x="872" y="190" width="250" height="86" rx="16" fill="#83b7b4"/>
+    <text x="898" y="226" fill="#101918" font-size="16" font-weight="700">03  FULL AUDIO</text>
+    <text x="898" y="253" fill="#263e3c" font-size="15">only after explicit approval</text>
+  </g>
+</svg>

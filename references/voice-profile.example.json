@@ -1,0 +1,46 @@
+{
+  "profile_version": "1",
+  "status": "candidate_preview_only",
+  "engine": "VoxCPM2",
+  "path_base": "profile",
+  "model_dir": "../local/models/VoxCPM2",
+  "reference_audio": "../local/reference.wav",
+  "reference_sha256": "SET_TO_SHA256_OF_YOUR_REFERENCE_AUDIO",
+  "prompt_cache_asset": null,
+  "generation": {
+    "cfg_value": 2.0,
+    "inference_timesteps": 20,
+    "normalize": false,
+    "denoise": false,
+    "sample_rate": 48000,
+    "chunk_min_chars": 18,
+    "chunk_max_chars": 70,
+    "chunking": {
+      "natural": {
+        "min_chars": 18,
+        "max_chars": 60
+      },
+      "course": {
+        "min_chars": 20,
+        "max_chars": 70
+      },
+      "short-video": {
+        "min_chars": 18,
+        "max_chars": 45
+      }
+    },
+    "max_audio_tokens": {
+      "natural": 100,
+      "course": 120,
+      "short-video": 90
+    },
+    "pacing": {
+      "min_char_count": 12,
+      "fast_ratio": 1.25,
+      "slow_ratio": 0.7,
+      "absolute_fast_cps": 6.0,
+      "quality_retries": 1
+    }
+  },
+  "ffmpeg_candidates": []
+}

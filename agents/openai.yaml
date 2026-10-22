@@ -1,0 +1,4 @@
+interface:
+  display_name: "按稿生成口播音频"
+  short_description: "接收一份最终口播，内部检查语义分段与朗读计划，用授权音色先试听再生成"
+  default_prompt: "使用 $generate-zhang-voiceover，按这份最终口播和我的本地声音配置生成试听，确认后再出完整音频。"
