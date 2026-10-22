@@ -1,52 +1,107 @@
 <div align="center">
 
-<h1>按稿生成口播音频</h1>
+<h1>中文口播音频 Skill</h1>
 
-<p><img src="docs/hero.svg" alt="按稿试听与生成的两段口播音频流程" width="860"></p>
+<picture>
+  <source media="(max-width: 640px)" srcset="docs/hero-mobile.svg">
+  <img src="docs/hero.svg" alt="让这份稿，用你的声音说出来：一份确认好的正文，先试听，再生成完整口播音频。" width="100%">
+</picture>
 
-<p><strong>交一份确认好的中文口播稿，用自己的音色先试听，再生成完整音频。</strong></p>
+**交一份确认好的中文口播稿，用自己的音色先试听，再生成完整音频。**
 
-<p><a href="#交付什么">交付</a> · <a href="#工作流程">流程</a> · <a href="#快速开始">安装</a> · <a href="#安全与隐私">安全</a> · <a href="#边界与许可">边界</a></p>
+[价值](#项目解决什么问题) · [交付](#你会得到什么) · [流程](#工作流程) · [安装](#快速开始) · [边界](#验证与限制)
 
-<p><img src="docs/badges/stage.svg" alt="Stage: Experimental"> <img src="docs/badges/python.svg" alt="Python: 3.10–3.12"></p>
+<p><a href="#验证与限制"><img src="docs/badges/stage.svg" alt="Stage: Experimental"></a> <a href="SKILL.md"><img src="docs/badges/platform.svg" alt="Platform: Codex"></a> <a href="references/local-setup.md"><img src="docs/badges/python.svg" alt="Python: 3.10–3.12"></a> <a href="requirements.txt"><img src="docs/badges/engine.svg" alt="Engine: VoxCPM2"></a></p>
 
 </div>
 
+> [!NOTE]
+> 实验阶段。真实合成需要你自己的模型、CUDA 环境和本人或已授权的参考录音。仓库提供 Skill 与配套工具，不包含作者的声音或模型权重。
+
 ## 项目解决什么问题
 
-这是 `generate-zhang-voiceover` 的可分发 Skill 包，面向需要中文口播和个人音色的创作者。写稿时就把内容说顺；音频阶段处理读法、分段、停顿与生成，始终使用同一份可见正文。
+稿子写好了，变成声音时还要处理读法、长句分段和停顿。直接生成整段音频，往往要听到最后才发现音色或语速不合适；如果过程中又改了一份“配音专用稿”，正文和音频也容易对不上。
 
-本项目处于实验阶段。代码与无模型测试可独立运行；真实声音合成需要自己配置模型、CUDA 环境和授权录音，仓库不含作者的声音。
+`generate-zhang-voiceover` 把这一段工作交给 Skill：**接收同一份可见正文，准备朗读计划，先生成短试听；你接受后，再生成完整音频。**
 
-## 交付什么
+面向制作中文短视频、知识讲解和产品介绍的创作者。日常使用只有两个入口：**写口播稿 → 生成音频**。这个仓库负责第二段，自带计划工具，可以独立接收你已经写好的稿件，无需另外安装母稿转换 Skill。
 
-- 一条短试听 WAV，以及确认后的完整口播 WAV。
-- 内部朗读计划：完整语义单元、受保护短语和段后停顿。
-- 内部生成清单与试听确认记录，绑定正文、声音配置和实际音频。
+## 你会得到什么
 
-普通用户只需交稿、听试听；无需管理 JSON。写稿 Skill 不是依赖，本仓库包含全部计划工具。
+| 交付 | 用来做什么 |
+| --- | --- |
+| **短试听 WAV** | 先听音色、语速、专有名词和停顿，再决定是否继续 |
+| **完整口播 WAV** | 接受试听后，按同一份稿件生成，供后续剪辑使用 |
+| **朗读计划与生成记录** | 记录语义单元、受保护短语、停顿，以及本次正文和声音配置，方便核对问题 |
+
+你负责交稿、听试听；代理负责内部计划和记录。普通使用不需要手动管理 JSON，也不需要维护两份近义稿。
 
 ## 工作流程
 
-| 用户操作 | Skill 内部处理 | 结果 |
-| --- | --- | --- |
-| 交一份已确认口播稿 | 检查读法和语义，建立并审核朗读计划 | 同一份正文，无隐藏改稿 |
-| 听短试听 | 使用同一参考音色，按完整单元合成 | 试听 WAV |
-| 明确接受试听 | 核对正文、计划、配置、参数和试听文件 | 完整 WAV 与可追溯清单 |
+<picture>
+  <source media="(max-width: 640px)" srcset="docs/workflow-mobile.svg">
+  <img src="docs/workflow.svg" alt="交稿后检查读法与分段，再生成短试听；用户明确接受后生成完整音频。正文、声音配置或生成参数变化，需要重新试听。" width="100%">
+</picture>
 
-VoxCPM2 按计划单元逐字生成，使用计划中的段后停顿。当前适配器不把“意图”字段当成情绪控制指令；自然度仍通过听感判断。
+| 你来决定 | Skill 来处理 |
+| --- | --- |
+| 确认可朗读的正文 | 核对读法、语义边界、固定搭配与停顿，审核朗读计划 |
+| 判断试听是否合适 | 按完整语义单元生成短试听，提供可播放的 WAV |
+| 明确接受试听，或提出修改 | 核对正文、计划、声音配置、参数和试听文件；确认仍然一致后生成完整 WAV |
+
+**改词就改回可见正文。** 自然口语化主要在写稿时完成；需要调整公式或数字的实际读法，也在正文中体现。合成阶段不另藏一份改写稿，计划模式禁用模型侧文本改写和变速。
+
+试听按语速估算约 **15–35 秒**，保留完整单元，实际时长可能不同。正文、计划、配置、参数或试听文件发生变化，旧确认不再适用，需要重新试听。
 
 ## 快速开始
 
-### 安装与第一次使用
+### 1. 安装 Skill
 
-将本仓库作为 Skill 文件夹安装，保留根目录的 `SKILL.md`、`scripts`、`references` 和 `agents`。例如在用户技能目录下克隆：
+在 Codex 中发送：
+
+```text
+使用 $skill-installer 安装下面仓库根目录中的 Skill，
+技能目录命名为 generate-zhang-voiceover：
+https://github.com/ZhangShixing0/generate-zhang-voiceover
+```
+
+安装后，在下一轮对话中调用 `generate-zhang-voiceover`。
+
+<details>
+<summary><strong>手动安装，或更新已有安装</strong></summary>
+
+在你的 Codex 用户技能目录下克隆仓库：
 
 ```text
 git clone https://github.com/ZhangShixing0/generate-zhang-voiceover.git
 ```
 
-不含模型的最短检查路径（在仓库目录运行）。依赖清单见 `requirements.txt` 和 `requirements-dev.txt`：
+保留完整文件夹，尤其是根目录的 `SKILL.md`、`scripts/`、`references/` 和 `agents/`。已有同名安装时，先比较并保留自己的声音配置、参考录音和缓存，不要覆盖私人文件。
+
+</details>
+
+### 2. 配置自己的声音
+
+按[本地声音配置](references/local-setup.md)准备 VoxCPM2、匹配的 CUDA / PyTorch 环境，以及本人或已获授权的参考录音，再填写[声音配置模板](references/voice-profile.example.json)。
+
+示例配置不会直接提供可用的声音。已有个人安装可继续使用自己的 `voice-profile.json`；也支持通过 `--profile` 或 `ZHANG_VOICE_PROFILE` 指向外部配置。
+
+### 3. 交稿，先听一小段
+
+准备一份已确认的口播 TXT，在 Codex 中发送：
+
+```text
+使用 $generate-zhang-voiceover，
+按这份已确认的口播稿和我的本地声音配置生成试听。
+先让我听音色、语速和停顿，我明确确认后再生成完整音频。
+```
+
+第一次应得到**试听 WAV**。如果不满意，直接指出要调整的地方；如果满意，明确接受试听后再继续。完整调用约定和命令见 [SKILL.md](SKILL.md)。
+
+<details>
+<summary><strong>还没有模型？先用示例检查朗读计划</strong></summary>
+
+在仓库目录运行以下命令，无需 GPU、语音模型或真人录音：
 
 ```text
 python -m pip install -r requirements-dev.txt
@@ -55,38 +110,35 @@ python scripts/voiceover_plan.py validate --text-file examples/voiceover.txt --p
 python -m unittest discover -s scripts -p "test_*.py"
 ```
 
-生成计划不会改动正文，也不会自动接受声音。代理需检查计划实际内容后再运行 `approve`。
+仓库的[合成示例稿](examples/voiceover.txt)包含三段正文。你会得到保留原文的朗读计划，并看到校验结果；这一步不会生成音频。生成的计划仍需代理实际检查后再执行 `approve`，计划审核也不代表用户已经接受声音。
 
-准备真实合成时，按[本地配置说明](references/local-setup.md)安装运行环境，填写自己的参考声音与模型路径。完整命令和交接规则见 [SKILL.md](SKILL.md)。
+依赖见 [requirements.txt](requirements.txt) 和 [requirements-dev.txt](requirements-dev.txt)。
 
-给代理的第一条指令可以是：
-
-> 使用 $generate-zhang-voiceover，按这份已确认的口播稿和我的本地声音配置生成试听。我确认后，再生成完整音频。
-
-`--profile` 和 `ZHANG_VOICE_PROFILE` 支持外部配置；已有个人安装可继续使用自己的 `voice-profile.json`。不要把示例配置当成可直接合成的声音。
+</details>
 
 ## 验证与限制
 
-测试覆盖稿件一致性、硬分段、语义单元顺序、停顿范围、试听绑定、配置变更、实际音频被替换后的失效，以及用合成测试信号验证的拼接长度。测试不需要 GPU、模型或真人录音。
+当前版本通过 **22 项本地测试**，覆盖正文与分段一致性、单元顺序、停顿范围、试听确认绑定、配置变化、音频替换失效，以及合成测试信号的拼接长度。测试不需要 GPU 或真人录音。
 
-仓库附有 [GitHub Actions 测试配置示例](examples/github-actions-tests.yml)，当前尚未启用自动测试。具备工作流管理权限后，将它放入 `.github/workflows/tests.yml` 即可启用；本次发布已通过本地 22 项测试。
+**这些检查不证明实际音色自然。** 本次发布未新生成真人声音，也未完成跨平台 GPU 合成验证；最终听感仍要由实际试听判断。
 
-测试通过不证明音色自然。本次发布没有新生成真人声音，也没有宣称跨平台 GPU 合成验证。适配器沿用本地 VoxCPM2 路线并调用提示缓存接口；升级引擎后应重新测试。CPU 合成与其他语音引擎未作为本包支持路径。
+| 当前范围 | 需要知道的边界 |
+| --- | --- |
+| **VoxCPM2 本地合成** | 沿用 CUDA 路线与提示缓存接口；CPU 合成及其他引擎未作为支持路径，升级引擎后需重新测试 |
+| **单一参考音色** | 计划中的“意图”是检查提示，适配器不据此自动控制情绪或逐句切换音色 |
+| **完整语义单元** | 局部单元文件可供排查，尚无自动单元重渲染命令 |
+| **可选 Vosk 对齐** | 需另装 Vosk 与中文模型；自动检查不能代替完整试听 |
 
-默认试听按语速估算约 15–35 秒，完整单元边界可能影响实际时长。局部单元文件可用于排查，尚无自动单元重渲染命令。
-
-可选的 Vosk 对齐脚本需要另外安装 Vosk 与中文模型；自动检查无法替代完整试听。
+仓库附有 [GitHub Actions 配置示例](examples/github-actions-tests.yml)，**线上自动测试尚未启用**。具备工作流管理权限后，可将示例放入 `.github/workflows/tests.yml`；本地通过不代表所有矩阵环境都已通过。
 
 ## 安全与隐私
 
-只使用本人或已获授权的参考声音。公开包不包含作者录音、提示缓存、模型权重、个人配置、真实项目稿件或生成音频。模型、参考音频、缓存、计划、清单、试听和最终 WAV 均留在本地。
+只使用本人或已获授权的参考声音。模型、参考音频、提示缓存、个人配置、朗读计划、生成记录和 WAV 均留在本地。公开包不含作者录音、真实项目稿件或生成音频。
+
+`.gitignore` 已覆盖这些本地产物，分享或再次发布前仍应核对实际文件。参考音频与缓存的校验方法见[本地配置说明](references/local-setup.md)。
 
 ## 边界与许可
 
-仓库公开不等于授予开源许可：作者尚未指定本项目的开源许可证，保留相应权利。第三方引擎及模型遵循各自许可。
+本 Skill 负责从确认稿到音频的交接与生成，不制作视频。语音引擎来自 [OpenBMB/VoxCPM](https://github.com/OpenBMB/VoxCPM)，本项目提供朗读计划、按稿执行和试听确认流程。
 
-模型侧文本改写与变速在计划模式中禁用。需要改词或删句时先修改可见稿件并确认，再重新生成；不能在声音阶段暗改。
-
-语音引擎来自 [OpenBMB/VoxCPM](https://github.com/OpenBMB/VoxCPM)，本项目提供的是口播交接、计划执行与试听验证流程，不是语音模型本身。
-
-
+**作者尚未指定本项目的开源许可证，保留相应权利。** 仓库公开不等于授予开源许可；第三方引擎与模型遵循各自许可。
