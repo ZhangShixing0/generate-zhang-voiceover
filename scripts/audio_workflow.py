@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from voiceover_plan import DEFAULT_RULES, file_sha256, validate_plan
+from unit_store import approve_unit
 
 
 def object_sha256(value: dict) -> str:
@@ -112,9 +113,23 @@ def validate_approval(approval_file: Path, expected: dict) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Record the user's acceptance of a generated preview.")
     parser.add_argument("--manifest", type=Path, required=True)
-    parser.add_argument("--approval", type=Path, required=True)
+    parser.add_argument("--approval", type=Path)
     parser.add_argument("--confirmed-by-user", action="store_true")
+    parser.add_argument("--unit-id", help="Approve one unit from a v3 manifest")
+    parser.add_argument("--approval-root", help="Cache root containing units/ and approvals/")
     args = parser.parse_args()
+    if args.unit_id:
+        manifest = json.loads(Path(args.manifest).read_text(encoding="utf-8"))
+        row = next((item for item in manifest.get("units", []) if item.get("unit_id") == args.unit_id), None)
+        if not row:
+            raise ValueError(f"Unit not found: {args.unit_id}")
+        plan_data = json.loads(Path(manifest["plan_file"]).read_text(encoding="utf-8"))
+        unit = next(unit for unit in plan_data["units"] if unit["unit_id"] == args.unit_id)
+        result = approve_unit(Path(args.approval_root or manifest["cache_dir"]), unit=unit, render_key_value=row["render_key"], audio_path=Path(row["audio"]), quality=row.get("quality", {}), confirmed_by_user=args.confirmed_by_user)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return
+    if not args.approval:
+        raise ValueError("--approval is required when recording a whole-preview approval")
     approve_preview(args.manifest, args.approval, args.confirmed_by_user)
     print(json.dumps({"approval": str(args.approval), "decision": "approved"}))
 

@@ -35,3 +35,7 @@ python scripts/generate_voiceover.py --profile references/voice-profile.local.js
 配置优先级：命令行 `--profile`，环境变量 `ZHANG_VOICE_PROFILE`，`voice-profile.local.json`，最后是既有 `voice-profile.json`。已有的个人安装无需迁移或覆盖原声音配置。
 
 模型、参考音频、缓存、计划、清单、试听和最终 WAV 均留在本地。公开仓库的 `.gitignore` 覆盖这些类型；发布前仍应检查实际候选文件。
+
+正式候选的词级质量检查还需要本地 Vosk 中文模型，并通过 `--vosk-model-dir` 或个人配置中的 `vosk_model_dir` 指定。Vosk 只提供词级起止时间和置信度；技能不会把词时间插值成虚假的单字强制对齐。
+
+`--stage draft` 使用 edge-tts 在线临时声音，脚本文字会发送到该服务。它只用于画面和节奏样片，不会读取或上传个人参考录音，也不能代替正式声音确认。
