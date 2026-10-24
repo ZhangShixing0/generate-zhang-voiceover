@@ -56,6 +56,11 @@ def run(args, gv) -> int:
     if args.inspect_chunks:
         print(json.dumps({"stage": stage, "units": units}, ensure_ascii=False, indent=2))
         return 0
+    if not args.output:
+        raise ValueError("--output is required")
+    output = Path(args.output).resolve()
+    if output.exists():
+        raise FileExistsError("Choose a new output name; existing audio and manifests are preserved.")
     if stage == "recording-script":
         write_recording_script(plan, Path(args.recording_script or (Path(args.output).with_suffix(".txt"))))
         return 0
@@ -88,11 +93,6 @@ def run(args, gv) -> int:
         delivery = assemble_delivery(plan=plan, unit_records=records, output=output, sample_rate=rate, stage=stage, source_file=source_file, plan_file=plan_file)
         print(json.dumps(delivery, ensure_ascii=False, indent=2))
         return 0
-    if not args.output:
-        raise ValueError("--output is required")
-    output = Path(args.output).resolve()
-    if output.exists():
-        raise FileExistsError("Choose a new output name; existing audio and manifests are preserved.")
     cache_root = Path(args.cache_dir).resolve() if args.cache_dir else output.parent / ".voiceover-cache"
     cache_root.mkdir(parents=True, exist_ok=True)
     profile = gv.load_profile(args.profile) if stage != "draft" else {"engine": "edge-tts-draft"}
