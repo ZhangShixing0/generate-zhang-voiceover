@@ -2,3 +2,8 @@
 voxcpm==2.0.3
 numpy>=1.24,<3
 soundfile>=0.12,<1
+# Draft stage sends script text to Microsoft's Edge TTS service; formal voice
+# generation remains local. Vosk supplies word-level QA timestamps.
+edge-tts>=7.2,<8
+imageio-ffmpeg>=0.6,<1
+vosk==0.3.45

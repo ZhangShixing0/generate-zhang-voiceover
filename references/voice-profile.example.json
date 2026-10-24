@@ -2,6 +2,7 @@
   "profile_version": "1",
   "status": "candidate_preview_only",
   "engine": "VoxCPM2",
+  "vosk_model_dir": null,
   "path_base": "profile",
   "model_dir": "../local/models/VoxCPM2",
   "reference_audio": "../local/reference.wav",

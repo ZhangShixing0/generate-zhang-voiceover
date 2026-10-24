@@ -124,7 +124,7 @@ class AudioWorkflowTests(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             generator.load_profile(self.root / "missing.json")
 
-    def test_generator_uses_plan_pauses_and_manifest_without_model(self):
+    def test_formal_preview_rejects_missing_word_alignment(self):
         # Synthetic audio exercises assembly; this is not a voice-quality test.
         output = self.root / "preview.wav"
         seen_text = []
@@ -150,17 +150,9 @@ class AudioWorkflowTests(unittest.TestCase):
              patch.object(generator, "synthesize_chunk", side_effect=synthetic), \
              patch.dict(sys.modules, {"torch": fake_torch, "voxcpm": fake_voxcpm}), \
              contextlib.redirect_stdout(io.StringIO()):
-            self.assertEqual(generator.main(), 0)
-        chunks = plan_chunks(self.plan, "preview", 28)
-        self.assertEqual(seen_text, [c["text"] for c in chunks])
-        expected_frames = rate * len(chunks) + sum(round(rate * c["pause_after_ms"]["target"] / 1000)
-                                                   for c in chunks[:-1])
-        self.assertEqual(sf.info(output).frames, expected_frames)
-        manifest = json.loads(output.with_suffix(".manifest.json").read_text(encoding="utf-8"))
-        self.assertEqual(manifest["source_sha256"], file_sha256(self.text))
-        self.assertEqual(manifest["plan_sha256"], file_sha256(self.plan_file))
-        self.assertEqual(manifest["audio_sha256"], file_sha256(output))
-        self.assertTrue((self.root / "preview-parts" / "u001.wav").is_file())
+            with self.assertRaisesRegex(ValueError, "No acceptable candidate path"):
+                generator.main()
+        self.assertFalse(output.exists())
 
     def test_full_generation_requires_approval_before_model_load(self):
         argv = ["generate_voiceover.py", "--text-file", str(self.text), "--plan", str(self.plan_file),

@@ -5,10 +5,20 @@ import json
 import wave
 from pathlib import Path
 
-from vosk import KaldiRecognizer, Model, SetLogLevel
+
+class VoskAligner:
+    """Load one model and return word timestamps; character timing is never invented."""
+    def __init__(self, model_dir: Path):
+        from vosk import Model, SetLogLevel
+        SetLogLevel(-1)
+        self.model = Model(str(model_dir))
+
+    def __call__(self, wav_path: Path) -> dict:
+        return align_file(self.model, wav_path)
 
 
 def align_file(model: Model, wav_path: Path) -> dict:
+    from vosk import KaldiRecognizer
     with wave.open(str(wav_path), "rb") as wav:
         if wav.getnchannels() != 1 or wav.getsampwidth() != 2:
             raise ValueError(f"WAV must be mono 16-bit PCM: {wav_path}")

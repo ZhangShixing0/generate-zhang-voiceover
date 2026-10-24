@@ -1,6 +1,6 @@
 ---
 name: generate-zhang-voiceover
-description: 将一份已确认的中文口播稿用本人或已授权的音色生成口播音频。内部完成读法核对、语义分段检查、朗读计划、短试听与完整音频，无需另装口播转换 Skill。用于用我的声音、克隆声音、生成试听和按稿配音；不在声音阶段悄悄改词，不制作视频。
+description: 将一份已确认的中文口播稿按稳定单元生成 edge-tts 样片、本人或已授权音色的正式候选，或导入真人录音，并交付词级时间表与字幕。使用 Vosk 做质量检查；不变速、不在声音阶段改词、不制作视频。
 ---
 
 # 按稿生成口播音频
@@ -89,3 +89,25 @@ python scripts/generate_voiceover.py --text-file <正文.txt> --plan <朗读计�
 默认只展示可直接播放的 WAV、时长和必要的待听问题。内部保留计划、清单与确认记录，但不要把哈希和技术步骤变成用户必须操作的流程。
 
 声音试听未通过时交付状态写“试听”；完整文件生成成功也不能自动写成“用户已接受”。始终区分文件生成、自动检查和用户听感确认。
+
+## 新版单元管线
+
+先用临时声音做样片，样片和正式音频共用稳定 `unit_id`，但正式音频必须重新测量真实时间：
+
+```text
+python scripts/generate_voiceover.py --text-file <正文.txt> --plan <朗读计划.json> --stage draft --output <样片.wav>
+```
+
+正式预览需要 Vosk 中文模型。每个单元生成三个候选，按去除停顿的短语语速、识别文本、置信度、无标点停顿、响度、音高和相邻衔接选最优；三个都失败时写 review 报告并停止交付。没有词级对齐证据不会自动通过。`--speed` 已删除，任何阶段都不变速。
+
+阈值和失败证据见 [audio-quality-contract.md](references/audio-quality-contract.md)。
+
+正文更新时，使用 `voiceover_plan.py build --previous-plan` 保留未变单元编号；文字哈希变化的单元才重新生成。每个接受的单元单独记录：
+
+```text
+python scripts/audio_workflow.py --manifest <候选.manifest.json> --unit-id u001 --confirmed-by-user
+```
+
+正式组装输出逐单元 WAV、`timeline.json`、SRT 和完整 WAV。时间表包含词和短语起止时间、说话区间及 `sfx_safe_intervals`，供视频字幕、动画和音效避让使用。
+
+真人整段录音先导出带编号台本，再用 Vosk 对齐 JSON 切分；转写不一致、边界低置信度或无法落在词边界时停止，不猜切点、不拉伸语速。样片会把脚本文字发送给 edge-tts 在线服务，参考录音、模型、缓存和正式音频仍只留在本地。
