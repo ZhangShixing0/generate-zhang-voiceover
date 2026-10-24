@@ -61,6 +61,7 @@ def run(args, gv) -> int:
     output = Path(args.output).resolve()
     if output.exists():
         raise FileExistsError("Choose a new output name; existing audio and manifests are preserved.")
+    output.parent.mkdir(parents=True, exist_ok=True)
     if stage == "recording-script":
         write_recording_script(plan, Path(args.recording_script or (Path(args.output).with_suffix(".txt"))))
         return 0
