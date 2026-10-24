@@ -105,8 +105,6 @@ def run(args, gv) -> int:
     }
     if stage == "final" and args.approval and not Path(args.approval).is_file():
         raise ValueError("The supplied whole-preview approval file does not exist")
-    if stage == "final" and not args.approval:
-        raise ValueError("--approval is required for final generation.")
     model = None
     prompt_cache = None
     sample_rate = 24000

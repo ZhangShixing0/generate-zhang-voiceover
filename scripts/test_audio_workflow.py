@@ -154,12 +154,12 @@ class AudioWorkflowTests(unittest.TestCase):
                 generator.main()
         self.assertFalse(output.exists())
 
-    def test_full_generation_requires_approval_before_model_load(self):
+    def test_full_generation_requires_rendered_and_approved_units(self):
         argv = ["generate_voiceover.py", "--text-file", str(self.text), "--plan", str(self.plan_file),
                 "--output", str(self.root / "final.wav"), "--stage", "final"]
         with patch.object(sys, "argv", argv), patch.object(generator, "load_profile", return_value=self.profile), \
              patch.object(generator, "validate_environment") as check_environment:
-            with self.assertRaisesRegex(ValueError, "--approval"):
+            with self.assertRaisesRegex(ValueError, "rendered candidate"):
                 generator.main()
         check_environment.assert_not_called()
 
